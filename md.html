@@ -15,14 +15,18 @@ path {
 <script src="http://d3js.org/topojson.v1.min.js"></script>
 <script>
 
-var width = 960,
+var width = 1260,
     height = 600;
 	
-var scale = 1500,
+/* NORMAL WAY*/
+	
+var scale = 8000,
 	offset = [width / 2, height / 2];
 	
-var projection = d3.geo.albers()
+var projection = d3.geo.mercator()
+	.center([103, 38.7])
 	.scale(scale)
+	.rotate([-180, 0])
 	.translate(offset);
 
 var path = d3.geo.path()
@@ -38,7 +42,65 @@ d3.json("md.json", function(error, us) {
   svg.append("path")
       .datum(topojson.mesh(us))
       .attr("d", path);
+	  
+	// add rect around SVG to set bounds! 
+	svg.append("rect")
+		.attr("width", width)
+		.attr("height", height)
+		.style("stroke", "darkred")
+		.style("fill", "none");
+	  
 });
+	
+/* DYNAMIC WAY */
+
+/*var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+	
+d3.json("md.json", function(error, md) {
+	// if error with data print to console
+	if (error) return conolse.error(error);
+	
+	// set up map within .json function
+	var center = d3.geo.centroid(md),	// center of data
+		scale = 500,
+		offset = [width / 2, height / 2];
+	
+	// projection of map	
+	var projection = d3.geo.mercator()
+						.scale(scale)
+						.center(center)
+						.translate(offset);
+						
+	var path = d3.geo.path()
+				.projection(projection);
+				
+	// use path to determine bounds of current map 
+	// use to determine better values of scale and translation
+	var bounds = path.bounds(md),
+		hori = scale * width / (bounds[1][0] - bounds[0][0]),
+		vert = scale * height / (bounds[1][1] - bounds[0][1]),
+		scale = (hori < vert) ? hori : vert,	// tertiary! 
+		offset = [width - (bounds[0][0] + bounds[1][0]) / 2, 
+					height - (bounds[0][1] + bounds[1][1]) / 2];
+	
+	// new projection based on above parameters				
+	projection = d3.geo.mercator()
+					.center(center)
+					.scale(scale)
+					.translate(offset);
+					
+	path = path.projection(projection);
+	
+	// add rect around SVG to set bounds! 
+	svg.append("rect")
+		.attr("width", width)
+		.attr("height", height)
+		.style("stroke", "black")
+		.style("fill", "none");
+	
+});*/
 	
 	
 </script>
