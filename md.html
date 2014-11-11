@@ -30,13 +30,14 @@ var projection = d3.geo.mercator()
 	.translate(offset);
 
 var path = d3.geo.path()
-    .projection(projection);
+    .projection(null);
 
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height);
 
-d3.json("md.json", function(error, us) {
+//d3.json("md.json", function(error, us) {
+d3.json("build/counties.json", function(error, us) {
   if (error) return console.error(error);
 
   svg.append("path")
