@@ -32,7 +32,8 @@ build/gz_2010_us_050_00_20m.shp: build/gz_2010_us_050_00_20m.zip
 #		
 #build/counties.json: build/cb_2013_us_county_500k.shp ACS_13_1YR_B01003_with_ann.csv
 #build/counties.json: build/cb_2013_us_county_500k.shp ACS_12_5YR_B01003_with_ann.csv
-build/counties.json: build/gz_2010_us_050_00_20m.shp ACS_12_5YR_B01003_with_ann.csv
+#build/counties.json: build/gz_2010_us_050_00_20m.shp ACS_12_5YR_B01003_with_ann.csv
+build/counties.json: build/gz_2010_us_050_00_20m.shp ACS_13_1YR_B01003_with_ann.csv
 	node_modules/.bin/topojson \
 	-o $@ \
 	--id-property='STATE+COUNTY, Id2' \
