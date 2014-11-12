@@ -10,11 +10,30 @@ path {
 }
 
 .bubble {
-  fill-opacity: .5;
-  stroke: #fff;
-  stroke-width: .5px;
+  fill: brown;
+  fill-opacity: 0.7;
+  stroke: #000;
+  stroke-width: 1.8px;
 }
 
+.county {
+	fill: red;
+	fill-opacity: 0.2;
+}
+
+.state-border {
+  fill: none;
+  stroke: #000;
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/*.bubble :hover {
+	fill: #000;
+	fill-opacity: 0.5;
+}
+*/
 </style>
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -28,7 +47,8 @@ var width = 1260,
 	
 var scale = 8000,
 	offset = [width / 2, height / 2];
-	
+
+// if projection not in Make	
 var projection = d3.geo.mercator()
 	.center([103, 38.7])
 	.scale(scale)
@@ -47,12 +67,22 @@ var svg = d3.select("body").append("svg")
     .attr("height", height);
 
 //d3.json("md.json", function(error, us) {
-d3.json("build/counties.json", function(error, md) {
+d3.json("us.json", function(error, md) {
   if (error) return console.error(error);
+  //console.log(md);
+  //console.log(md.objects);
+  //console.log(md.objects.counties);
 
   svg.append("path")
       .datum(topojson.mesh(md))
+	  .attr("class", "county")
       .attr("d", path);
+	  
+  svg.append("path")
+	  .datum(topojson.mesh(md, md.objects.states, function(a, b) {
+		  return a !== b; }))
+	  .attr("class", "state-border state-border--state")
+	  .attr("d", path);
 	  
   svg.append("g")
       .attr("class", "bubble")
@@ -62,8 +92,19 @@ d3.json("build/counties.json", function(error, md) {
     .enter().append("circle")
       .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
       //.attr("r", function(d) { return radius(d.properties.population); });
-	  .attr("r", 1.5);
-	  //.attr("r", function(d) { return radius(d.properties.population); });
+	  /*.attr("r", 5.0)
+	  .on("mouseover", function(d) {
+		  d3.select(this).attr("r", 10.0);
+	  })
+	  .on("mouseout", function(d) {
+		  d3.select(this).attr("r", 5.0);
+	  });*/
+	  .attr("r", function(d) { return radius(d.properties.population); })
+	  .on("mouseover", function(d) {
+		  d3.select(this).attr("fill", "black"); })
+	  .on("mouseout", function(d) {
+		  d3.select(this).attr("fill", "brown");
+	  });
 	  
 	// add rect around SVG to set bounds! 
 	svg.append("rect")
