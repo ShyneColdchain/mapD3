@@ -26,7 +26,7 @@ build/counties.json: build/cb_2013_us_county_500k.shp ACS_13_1YR_B01003_with_ann
 	--properties='name=Geography' \
 	--properties='population=+d.properties["Estimate; Total"]' \
 	--projection='width = 1260, height = 600, d3.geo.mercator() \
-		.scale(1280) \
+		.scale(7080) \
 		.center([103, 38.7]) \
 		.rotate([-180, 0]) \
 		.translate([width / 2, height / 2])' \
