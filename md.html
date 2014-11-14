@@ -9,6 +9,23 @@
   stroke-width: 1.8px;
 }
 
+.bubble :hover {
+	fill: #7FFFD4;
+	fill-opacity: 0.4;
+}
+
+.bubble05 {
+  fill: #CC0066;
+  fill-opacity: 0.4;
+  stroke: #000;
+  stroke-width: 1.8px;
+}
+
+.bubble05 :hover {
+	fill: #7FFFD4;
+	fill-opacity: 0.4;
+}
+
 .county {
 	fill: red;
 	fill-opacity: 0.15;
@@ -24,19 +41,29 @@
   stroke-linecap: round;
 }
 
-.bubble :hover {
-	fill: #7FFFD4;
-	fill-opacity: 0.4;
+.button2013 button {
+  left: 1100px;
+  position: absolute;
+  top: 320px;
+  width: 120px;
+}
+
+.button2005 button {
+  left: 1100px;
+  position: absolute;
+  top: 350px;
+  width: 120px;
 }
 
 </style>
 <body>
-	
-<div id="option">
-    <input name="updateButton" 
-           type="button" 
-           value="Update" 
-           onclick="updateData()" />
+
+<div class = "button2013" id = "pop2013">
+    <button>Pop. 2013</button>
+</div>
+
+<div class = "button2005" id = "pop2005">
+    <button>Pop. 2005</button>
 </div>
 	
 <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -131,6 +158,42 @@ d3.json("us.json", function(error, md) {
 				  "<span style='color:eggwhite'>" + n + "</span>";
 	  }
   });
+  
+  // pop2013 button! 
+  d3.select("#pop2013 button").on("click", function () {
+	  svg.selectAll("circle").transition()
+		  .duration(2000)
+			  .attr("r", function(d) { return radius(d.properties.population) * 2; });  
+  });
+  
+  // pop2005 button! 
+  d3.select("#pop2005 button").on("click", function () {
+	  d3.json("us05.json", function(error, md) {
+	    if (error) return console.error(error);
+		
+	    svg.append("g")	  
+	        .attr("class", "bubble05")
+	      .selectAll("circle")
+	        .data(topojson.feature(md, md.objects.counties).features
+	          .sort(function(a, b) { return b.properties.population - a.properties.population; }))
+	      .enter().append("svg:circle")
+	        .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
+	  	  .attr("r", function(d) { return radius(d.properties.population) * 2; });
+	
+	    // tipsy tooltip
+	    $('svg circle').tipsy({
+	  	  gravity: 'width',
+	  	  html: true,
+	  	  title: function() {
+	  		  var d = this.__data__, n = d.properties.name, p = d.properties.population;
+	  		  return "<span style='color:#F9C396'>Pop: </span>"
+	  				  + "<span style='color:white'>" + p + "</span>" +
+	  				  " " + "<span style='color:#FFF3C3'>County: </span>" +
+	  				  "<span style='color:eggwhite'>" + n + "</span>";
+	  	  }
+	    });
+	});
+  });
 		   
 	// add rect around SVG to set bounds! 
 	svg.append("rect")
@@ -141,37 +204,6 @@ d3.json("us.json", function(error, md) {
 		.style("fill", "none");
 	  
 });
-
-// ** Update data section (Called from the onclick)
-function updateData() {
-
-    // Get the data again		
-	d3.json("us.json", function(error, md) {
-	  if (error) return console.error(error);
-	  
-	// selection we want to apply our changes to  
-    var svg = d3.select("body").transition();
-
-	svg.select(".bubble")
-		.duration(750)
-		.attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
-		.attr("r", function(d) { return radius(d.properties.population) * 5; });
-
-	  // tipsy tooltip
-	  $('svg circle').tipsy({
-		  gravity: 'width',
-		  html: true,
-		  title: function() {
-			  var d = this.__data__, n = d.properties.name, p = d.properties.population;
-			  return "<span style='color:#F9C396'>Pop: </span>"
-					  + "<span style='color:white'>" + p + "</span>" +
-					  " " + "<span style='color:#FFF3C3'>County: </span>" +
-					  "<span style='color:eggwhite'>" + n + "</span>";
-		  }
-	  });
-	  
-  });
-}
 	
 </script>
 </body>
