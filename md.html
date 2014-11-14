@@ -11,7 +11,7 @@
 
 .county {
 	fill: red;
-	fill-opacity: 0.2;
+	fill-opacity: 0.15;
 	stroke: #000;
 	stroke-width: 1.8px;
 }
@@ -24,11 +24,11 @@
   stroke-linecap: round;
 }
 
-/*.bubble :hover {
-	fill: #000;
-	fill-opacity: 0.5;
+.bubble :hover {
+	fill: #7FFFD4;
+	fill-opacity: 0.4;
 }
-*/
+
 
 /* d3-tip to add tooltip */
 .d3-tip {
@@ -63,7 +63,9 @@
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/topojson.v1.min.js"></script>
-<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script> 
+<script type="text/javascript" src="jquery.tipsy.js"></script>
+<link href="tipsy.css" rel="stylesheet" type="text/css" />
 <script>
 
 var width = 1260,
@@ -110,7 +112,6 @@ d3.json("us.json", function(error, md) {
       .attr("d", path);
 	  
   /*  Would like to draw counties as individual paths...
-  
   svg.append("g")
     //  .datum(topojson.mesh(md))
 	  .attr("class", "county")
@@ -130,55 +131,28 @@ d3.json("us.json", function(error, md) {
 		  return a !== b; }))
 	  .attr("class", "border border--state")
 	  .attr("d", path);
-	  
-  // mouseover tip
-  //var tip = function(d) 
-	  
-  // county name + population size
-  var names = svg.selectAll("text")
-	  .data(topojson.feature(md, md.objects.counties).features)
-	  .enter()
-	  .append("text")
-		  .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
-		  .text(function(d) { 
-			  return d.properties.name + "\nPopulation " + d.properties.population})
-		  .attr("font-family", "sans-serif")
-		  .attr("font-size", "0px")
-		  .attr("fill", "black");
-		  /*.attr("pointer-events", "none")	// wait to display data!
-			  .on("mouseover", function(d) {
-				  d3.select(this).attr("font-size", "10px"); })
-			  .on("mouseout", function(d) {
-				  d3.select(this).attr("font-size", "0px"); });*/
-		  
-  // toolTips 
-  var tip = d3.tip()
-	  .attr("class", "d3-tip")
-	  .offset([-10, 0])
-	  .html(function(d) { 
-			return "<span style='color:#FF99FF'>" 
-			+ d.properties.name + "\nPopulation: " 
-			+ d.properties.population + "</span>"; });
-	  
-  var bubbles = svg.append("g")
+  
+  svg.append("g")	  
       .attr("class", "bubble")
     .selectAll("circle")
       .data(topojson.feature(md, md.objects.counties).features
         .sort(function(a, b) { return b.properties.population - a.properties.population; }))
-    .enter().append("circle")
+    .enter().append("svg:circle")
       .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
-	  .attr("r", function(d) { return radius(d.properties.population) * 2; })
-		  //.on("mouseover", tip.show)
-		  //.on("mouseout", tip.hide);
-		  .on("mouseover", function(d) {
-			  //names.attr("font-size", "10px")
-			  d3.select(this)
-			  .attr("fill", "black");
-		   })
-		  .on("mouseout", function(d) {
-			  //names.attr("font-size", "0px")
-			  d3.select(this)
-			  .attr("fill", "brown"); });
+	  .attr("r", function(d) { return radius(d.properties.population) * 2; });
+
+  // tipsy tooltip
+  $('svg circle').tipsy({
+	  gravity: 'width',
+	  html: true,
+	  title: function() {
+		  var d = this.__data__, n = d.properties.name, p = d.properties.population;
+		  return "<span style='color:#F9C396'>Pop: </span>"
+				  + "<span style='color:white'>" + p + "</span>" +
+				  " " + "<span style='color:#FFF3C3'>County: </span>" +
+				  "<span style='color:eggwhite'>" + n + "</span>";
+	  }
+  });
 		   
 	// add rect around SVG to set bounds! 
 	svg.append("rect")
