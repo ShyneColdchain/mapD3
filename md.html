@@ -31,6 +31,14 @@
 
 </style>
 <body>
+	
+<div id="option">
+    <input name="updateButton" 
+           type="button" 
+           value="Update" 
+           onclick="updateData()" />
+</div>
+	
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="http://d3js.org/topojson.v1.min.js"></script>
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.2.min.js"></script> 
@@ -133,60 +141,37 @@ d3.json("us.json", function(error, md) {
 		.style("fill", "none");
 	  
 });
-	
-/* DYNAMIC WAY 
 
-To access location of map, scale, center, etc
+// ** Update data section (Called from the onclick)
+function updateData() {
 
-*/
+    // Get the data again		
+	d3.json("us.json", function(error, md) {
+	  if (error) return console.error(error);
+	  
+	// selection we want to apply our changes to  
+    var svg = d3.select("body").transition();
 
-/*var svg = d3.select("body").append("svg")
-    .attr("width", width)
-    .attr("height", height);
-	
-d3.json("md.json", function(error, md) {
-	// if error with data print to console
-	if (error) return conolse.error(error);
-	
-	// set up map within .json function
-	var center = d3.geo.centroid(md),	// center of data
-		scale = 500,
-		offset = [width / 2, height / 2];
-	
-	// projection of map	
-	var projection = d3.geo.mercator()
-						.scale(scale)
-						.center(center)
-						.translate(offset);
-						
-	var path = d3.geo.path()
-				.projection(projection);
-				
-	// use path to determine bounds of current map 
-	// use to determine better values of scale and translation
-	var bounds = path.bounds(md),
-		hori = scale * width / (bounds[1][0] - bounds[0][0]),
-		vert = scale * height / (bounds[1][1] - bounds[0][1]),
-		scale = (hori < vert) ? hori : vert,	// tertiary! 
-		offset = [width - (bounds[0][0] + bounds[1][0]) / 2, 
-					height - (bounds[0][1] + bounds[1][1]) / 2];
-	
-	// new projection based on above parameters				
-	projection = d3.geo.mercator()
-					.center(center)
-					.scale(scale)
-					.translate(offset);
-					
-	path = path.projection(projection);
-	
-	// add rect around SVG to set bounds! 
-	svg.append("rect")
-		.attr("width", width)
-		.attr("height", height)
-		.style("stroke", "black")
-		.style("fill", "none");
-	
-});*/
-	
+	svg.select(".bubble")
+		.duration(750)
+		.attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
+		.attr("r", function(d) { return radius(d.properties.population) * 5; });
+
+	  // tipsy tooltip
+	  $('svg circle').tipsy({
+		  gravity: 'width',
+		  html: true,
+		  title: function() {
+			  var d = this.__data__, n = d.properties.name, p = d.properties.population;
+			  return "<span style='color:#F9C396'>Pop: </span>"
+					  + "<span style='color:white'>" + p + "</span>" +
+					  " " + "<span style='color:#FFF3C3'>County: </span>" +
+					  "<span style='color:eggwhite'>" + n + "</span>";
+		  }
+	  });
+	  
+  });
+}
 	
 </script>
+</body>
