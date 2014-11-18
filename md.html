@@ -137,33 +137,36 @@ d3.json("us.json", function(error, md) {
 	  .attr("class", "border border--state")
 	  .attr("d", path);
   
-  svg.append("g")	  
-      .attr("class", "bubble")
-    .selectAll("circle")
-      .data(topojson.feature(md, md.objects.counties).features
-        .sort(function(a, b) { return b.properties.population - a.properties.population; }))
-    .enter().append("svg:circle")
-      .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
-	  .attr("r", function(d) { return radius(d.properties.population) * 2; });
-
-  // tipsy tooltip
-  $('svg circle').tipsy({
-	  gravity: 'width',
-	  html: true,
-	  title: function() {
-		  var d = this.__data__, n = d.properties.name, p = d.properties.population;
-		  return "<span style='color:#F9C396'>Pop: </span>"
-				  + "<span style='color:white'>" + p + "</span>" +
-				  " " + "<span style='color:#FFF3C3'>County: </span>" +
-				  "<span style='color:eggwhite'>" + n + "</span>";
-	  }
-  });
-  
   // pop2013 button! 
   d3.select("#pop2013 button").on("click", function () {
-	  svg.selectAll("circle").transition()
+	  d3.json("us.json", function(error, md) {
+	    if (error) return console.error(error);
+	  /*svg.selectAll("circle").transition()
 		  .duration(2000)
-			  .attr("r", function(d) { return radius(d.properties.population) * 2; });  
+			  .attr("r", function(d) { return radius(d.properties.population) * 2; });*/
+			  
+	  svg.append("g")	  
+	      .attr("class", "bubble")
+	    .selectAll("circle")
+	      .data(topojson.feature(md, md.objects.counties).features
+	        .sort(function(a, b) { return b.properties.population - a.properties.population; }))
+	    .enter().append("svg:circle")
+	      .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
+		  .attr("r", function(d) { return radius(d.properties.population) * 2; });
+
+	  // tipsy tooltip
+	  $('svg circle').tipsy({
+		  gravity: 'width',
+		  html: true,
+		  title: function() {
+			  var d = this.__data__, n = d.properties.name, p = d.properties.population;
+			  return "<span style='color:#F9C396'>Pop: </span>"
+					  + "<span style='color:white'>" + p + "</span>" +
+					  " " + "<span style='color:#FFF3C3'>County: </span>" +
+					  "<span style='color:eggwhite'>" + n + "</span>";
+	  	  }
+	    });
+	});
   });
   
   // pop2005 button! 
