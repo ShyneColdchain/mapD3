@@ -10,13 +10,12 @@
 }
 
 .bubble :hover {
-	fill: #7FFFD4;
+	fill: #000;
 	fill-opacity: 0.4;
 }
 
 .enter {
-  /*fill: #CC0066;*/
-  fill: green;
+  fill: #CC0066;
   fill-opacity: 0.4;
   stroke: #000;
   stroke-width: 1.8px;
@@ -25,6 +24,8 @@
 .enter :hover {
 	fill: #7FFFD4;
 	fill-opacity: 0.4;
+    stroke: #000;
+    stroke-width: 3.0px;
 }
 
 .county {
@@ -42,20 +43,16 @@
   stroke-linecap: round;
 }
 
-.update {
-  fill: #333;
-}
-
-.update :hover {
-	fill: #7FFFD4;
-	fill-opacity: 0.4;
-}
-
 .exit {
 	fill: brown;
+	fill-opacity: 0.5;
 }
 
-.button2013 button {
+.exit: hover {
+	fill: #000;
+}
+
+.button2012 button {
   left: 1100px;
   position: absolute;
   top: 320px;
@@ -72,11 +69,11 @@
 </style>
 <body>
 
-<div class = "button2013" id = "pop2013">
-    <input name="button2013" 
+<div class = "button2012" id = "pop2012">
+    <input name="button2012" 
              type="button" 
-             value="Pop 2013" 
-             onclick="update2013()" />
+             value="Pop 2012" 
+             onclick="update2012()" />
 </div>
 
 <div class = "button2005" id = "pop2005">
@@ -167,7 +164,7 @@ d3.json("us.json", function(error, md) {
 	  
 });
 
-function update2013() { 
+function update2012() { 
     d3.json("us.json", function(error, md) {
       if (error) return console.error(error);
 	  
@@ -193,34 +190,27 @@ function update2005() {
 
 function update(data) { 
 	 
+	svg.selectAll("circle")
+	.attr("class", "exit")
+		.transition().duration(2000)
+			.attr("r", 0.0)
+			.style("fill-opacity", 0.001)
+			.remove();
+	 
 	// new data joins old elements 'circle'
 	var update = svg.append("g")
 		.selectAll("circle")
 		.data(data);
-	
-	// update 
-	update.attr("class", "update");
-		/*.transition().duration(2000)
-			.attr("transform", function(d) { 
-				return "translate(" + path.centroid(d) + ")"; })
-			.attr("r", 5.0);*/
 
 	// enter new elements 
 	update.enter()
 		.append("svg:circle").attr("class", "enter")
+		.transition().duration(1000)
 	      .attr("transform", function(d) { return "translate(" + path.centroid(d) + ")"; })
 		  .attr("r", 0.0)
 		  .transition().duration(1500)
 			.attr("r", function(d) { 
 				return radius(d.properties.population) * 2; });
-			
-	// exit - remove old elements 
-	update.exit()
-		.attr("class", "exit")
-		.transition().duration(2000)
-			.attr("r", 0.0)
-			.style("fill-opacity", 0.01)
-			.remove();
 
 	// tipsy tooltip
 	$('svg circle').tipsy({
